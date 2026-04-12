@@ -2,60 +2,76 @@ import { NavLink, Outlet, useNavigate } from "react-router";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { Authenticated, Unauthenticated, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
+import { useState } from "react";
 
 export default function Layout() {
   const { signOut } = useAuthActions();
   const user = useQuery(api.users.getUser);
   const navigate = useNavigate();
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   return (
     <div className="min-h-screen flex flex-col" data-theme="light">
-      <nav className="bg-base-300 p-4 flex justify-between">
+      <nav className="bg-base-300 p-4 flex">
         {/* menus */}
-        <div className="flex gap-4">
-          <NavLink
-            to="/"
-            className={({ isActive }) => (isActive ? "text-primary" : "")}
-          >
-            Home
-          </NavLink>
-          <NavLink
-            to="/login"
-            className={({ isActive }) => (isActive ? "text-primary" : "")}
-          >
-            Login
-          </NavLink>
+        <div className="">
+          <div className="flex gap-4">
+            <NavLink
+              to="/"
+              className={({ isActive }) => (isActive ? "text-primary" : "")}
+            >
+              Home
+            </NavLink>
+            <NavLink
+              to="/"
+              className={({ isActive }) => (isActive ? "" : "")}
+            >
+              Connect to explore page
+            </NavLink>
+          </div>
         </div>
 
-        {/* user info */}
-        <div>
+        {/* post */}
+        <div className="">
           <Authenticated>
-            <div className="flex items-center gap-2">
+            <div className="gap-2 mx-2">
               <button
-                className="btn btn-primary btn-sm mx-2"
+                className=""
                 onClick={() => navigate("/create-post")}
               >
                 Post
               </button>
-              <li>
-                <details>
-                  <summary className="text-sm font-bold text-primary">
-                    🧑‍🦱 {user?.email.split("@")[0]}
-                  </summary>
-                  <ul className="rounded-t-none p-2">
-                    <li>
-                      <button
-                        className="btn btn-neutral btn-sm"
-                        onClick={() => signOut()}
-                      >
-                        Logout
-                      </button>
-                    </li>
-                  </ul>
-                </details>
-              </li>
             </div>
           </Authenticated>
+        </div>
+
+
+        {/* profile */}
+        <div className="ml-auto">
+          <Authenticated>
+            <div className="flex items-center gap-2">
+
+              <ul className="relative">
+                <details className="">
+                  <summary className="text-sm font-bold text-primary" onClick={(v) => setShowUserMenu(!v)}>
+                    🧑‍🦱 {user?.email.split("@")[0]}!!!
+                  </summary>
+
+                  <div className={`rounded-t-none bg-base-300 p-3 absolute`}>
+                    <div>
+                      <li className="text-sm m-1 top-10"
+                        onClick={() => signOut()}><a>Sign Out</a></li>
+                      <li className="text-sm m-1 top-10"
+                        onClick={() => (true)}><a>Profile (need to connect) </a></li>
+                    </div>
+                  </div>
+                </details>
+              </ul>
+            </div>
+          </Authenticated>
+
+
+
           <Unauthenticated>
             <NavLink to="/login">
               <button className="btn btn-sm">Login</button>
