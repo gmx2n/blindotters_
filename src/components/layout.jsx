@@ -12,7 +12,7 @@ export default function Layout() {
 
   return (
     <div className="min-h-screen flex flex-col" data-theme="icepirate">
-      <nav className="bg-infos p-4 flex">
+      <nav className="bg-infos bg-info p-4 flex">
         {/* menus */}
         <div className="">
           <div className="flex gap-4">
@@ -54,12 +54,12 @@ export default function Layout() {
               <ul className="relative">
                 <details className="">
                   <summary className="text-sm font-bold text-primary" onClick={(v) => setShowUserMenu(!v)}>
-                    🧑‍🦱 {user?.email.split("@")[0]}!!!
+                    🌱 {user?.email.split("@")[0]}
                   </summary>
 
-                  <div className={`rounded-t-none bg-base-300 p-3 absolute`}>
+                  <div className={`rounded-t-none p-1 absolute`}>
                     <div>
-                      <li className="text-sm m-1 top-10"
+                      <li className="text-sm bg-info text-primary p-2 "
                         onClick={() => signOut()}><a>Sign Out</a></li>
                     </div>
                   </div>
