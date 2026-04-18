@@ -5,6 +5,7 @@ import { ConvexReactClient } from "convex/react";
 import "./index.css";
 import App from "./App.jsx";
 import { BrowserRouter } from "react-router";
+import './index.css'
 
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL);
 
