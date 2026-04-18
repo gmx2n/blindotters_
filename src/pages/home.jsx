@@ -22,11 +22,6 @@ export default function HomePage() {
           ))}
         </div>
 
-        {status === "CanLoadMore" && (
-          <button className="btn btn-primary mt-4" onClick={() => loadMore(10)}>
-            Load more
-          </button>
-        )}
       </div>
     </div>
   );
@@ -38,7 +33,6 @@ function Post({ post }) {
 
   return (
     <div className="mb-2 p-3 border rounded bg-white/80 flex items-center gap-3">
-      {/* only shows item name */}
       <span className="font-semibold text-gray-800">{post.name}</span>
 
       {post.authorId === user?._id && (
@@ -46,7 +40,7 @@ function Post({ post }) {
           className="btn btn-xs btn-error ml-auto"
           onClick={() => deletePost({ postId: post._id })}
         >
-          Delete
+          x
         </button>
       )}
     </div>

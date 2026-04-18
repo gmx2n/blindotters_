@@ -84,7 +84,7 @@ export default function PostForm() {
             className="btn btn-error btn-sm"
             onClick={() => removeItem(index)}
           >
-            Remove
+            remove
           </button>
         </fieldset>
       ))}
