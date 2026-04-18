@@ -13,7 +13,6 @@ export default function PostForm() {
 
   const addItem = () => {
     if (items.length >= 15) return;
-
     setItems([...items, { name: "", quantity: 1, expiration: "" }]);
   };
 
@@ -30,44 +29,39 @@ export default function PostForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // send entire array to backend
-    await createPost({
-      items,
-    });
+    // each item becomes its own post — all uploaded at once
+    await Promise.all(
+      items.map((item) =>
+        createPost({
+          name: item.name,
+          quantity: item.quantity,
+          expiration: item.expiration,
+        })
+      )
+    );
 
     navigate("/");
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="flex flex-col gap-4 m-6"
-    >
-      <div className="text-lg font-semibold">
-        Your groceries
-      </div>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4 m-6">
+      <div className="text-lg font-semibold">Your groceries</div>
 
       {items.map((item, index) => (
         <fieldset
           key={index}
-          className="fieldset bg-base-200 border-base-300 rounded-box border p-4 m-2 flex"
+          className="fieldset bg-base-200 border-base-300 rounded-box border p-4 m-2 flex gap-2 items-center"
         >
-          <legend className="fieldset-legend">
-            Item {index + 1}
-          </legend>
+          <legend className="fieldset-legend">Item {index + 1}</legend>
 
-          {/* Name */}
           <input
             type="text"
             className="input"
-            placeholder="Name of item"
+            placeholder="Item name"
             value={item.name}
-            onChange={(e) =>
-              updateItem(index, "name", e.target.value)
-            }
+            onChange={(e) => updateItem(index, "name", e.target.value)}
           />
 
-          {/* Quantity */}
           <input
             type="number"
             className="input"
@@ -78,20 +72,16 @@ export default function PostForm() {
             }
           />
 
-          {/* Expiration */}
           <input
             type="date"
             className="input"
             value={item.expiration}
-            onChange={(e) =>
-              updateItem(index, "expiration", e.target.value)
-            }
+            onChange={(e) => updateItem(index, "expiration", e.target.value)}
           />
 
-          {/* Remove */}
           <button
             type="button"
-            className="btn btn-error btn-sm mt-2"
+            className="btn btn-error btn-sm"
             onClick={() => removeItem(index)}
           >
             Remove
@@ -99,7 +89,6 @@ export default function PostForm() {
         </fieldset>
       ))}
 
-      {/* Add item */}
       <div className="flex">
         <button
           type="button"
@@ -110,7 +99,6 @@ export default function PostForm() {
           Add another item
         </button>
 
-        {/* Submit */}
         <button type="submit" className="btn btn-success mx-4">
           Add to fridge
         </button>

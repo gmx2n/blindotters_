@@ -5,38 +5,29 @@ import { paginationOptsValidator } from "convex/server";
 
 export const createPost = mutation({
   args: {
-    title: v.string(),
-    content: v.string(),
-    address: v.string()
+    name: v.string(),
+    quantity: v.number(),
+    expiration: v.string(),
   },
-  handler: async (ctx, { title, content, address }) => {
+  handler: async (ctx, { name, quantity, expiration }) => {
     const userId = await getAuthUserId(ctx);
-    if (!userId) {
-      throw new Error("Not authenticated");
-    }
+    if (!userId) throw new Error("Not authenticated");
 
     const user = await ctx.db.get(userId);
-    if (!user) {
-      throw new Error("User not found");
-    }
+    if (!user) throw new Error("User not found");
 
-    const post = {
-      title,
-      content,
+    await ctx.db.insert("post", {
+      name,
+      quantity,
+      expiration,
       authorId: userId,
-      authorName: user.email!.split("@")[0], 
-      point: {longitude: 0.0, latitude: 0.0}, 
-      address,  // Use the part of the email before the "@" as the author name
-    };
-    await ctx.db.insert("post", post);
+      authorName: user.email!.split("@")[0],
+    });
   },
 });
 
-
-
 export const getPosts = query({
   args: {
-    // paginationOptsValidator needs to be imported from convex/server
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, { paginationOpts }) => {
@@ -44,25 +35,17 @@ export const getPosts = query({
   },
 });
 
-
 export const deletePost = mutation({
   args: {
     postId: v.id("post"),
   },
   handler: async (ctx, { postId }) => {
     const userId = await getAuthUserId(ctx);
-    if (!userId) {
-      throw new Error("Not authenticated");
-    }
+    if (!userId) throw new Error("Not authenticated");
 
     const post = await ctx.db.get(postId);
-    if (!post) {
-      throw new Error("Post not found");
-    }
-
-    if (post.authorId !== userId) {
-      throw new Error("Not authorized to delete this post");
-    }
+    if (!post) throw new Error("Post not found");
+    if (post.authorId !== userId) throw new Error("Not authorized");
 
     await ctx.db.delete(postId);
   },
@@ -74,9 +57,7 @@ export const getPost = query({
   },
   handler: async (ctx, { postId }) => {
     const post = await ctx.db.get(postId);
-    if (!post) {
-      throw new Error("Post not found");
-    }
+    if (!post) throw new Error("Post not found");
     return post;
   },
 });
