@@ -11,35 +11,35 @@ export default function Layout() {
   const [showUserMenu, setShowUserMenu] = useState(false);
 
   return (
-    <div className="min-h-screen flex flex-col" data-theme="light">
-      <nav className="bg-base-300 p-4 flex">
+    <div className="min-h-screen flex flex-col" data-theme="icepirate">
+      <nav className="bg-infos p-4 flex">
         {/* menus */}
         <div className="">
           <div className="flex gap-4">
+            <Authenticated>
+              <NavLink
+                to="/"
+                className={({ isActive }) => (isActive ? "text-primary" : "")}
+              >
+                My Fridge
+              </NavLink>
+            </Authenticated>
             <NavLink
-              to="/"
-              className={({ isActive }) => (isActive ? "text-primary" : "")}
-            >
-              Home
-            </NavLink>
-            <NavLink
-              to="/"
+              to="/chat"
               className={({ isActive }) => (isActive ? "" : "")}
             >
-              Connect to explore page
+              Chat
             </NavLink>
           </div>
         </div>
-
-        {/* post */}
         <div className="">
           <Authenticated>
-            <div className="gap-2 mx-2">
+            <div className="gap-2 mx-4">
               <button
                 className=""
                 onClick={() => navigate("/create-post")}
               >
-                Post
+                My Groceries
               </button>
             </div>
           </Authenticated>
@@ -61,8 +61,6 @@ export default function Layout() {
                     <div>
                       <li className="text-sm m-1 top-10"
                         onClick={() => signOut()}><a>Sign Out</a></li>
-                      <li className="text-sm m-1 top-10"
-                        onClick={() => (true)}><a>Profile (need to connect) </a></li>
                     </div>
                   </div>
                 </details>

@@ -29,6 +29,9 @@ importers:
       react-router:
         specifier: ^7.13.1
         version: 7.13.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      together-ai:
+        specifier: ^0.39.0
+        version: 0.39.0
     devDependencies:
       '@convex-dev/eslint-plugin':
         specifier: ^1.1.1
@@ -1609,6 +1612,10 @@ packages:
     resolution: {integrity: sha512-j2Zq4NyQYG5XMST4cbs02Ak8iJUdxRM0XI5QyxXuZOzKOINmWurp3smXu3y5wDcJrptwpSjgXHzIQxR0omXljQ==}
     engines: {node: '>=12.0.0'}
 
+  together-ai@0.39.0:
+    resolution: {integrity: sha512-e4blbAaPXLhVkhTQjKLAYQgqTkAaGQ7Ie2DmKiPml2DBpKRurMXbQbPPkVdYcXEMSMtyfrYEId2mJd9JW0PKTg==}
+    hasBin: true
+
   ts-api-utils@2.4.0:
     resolution: {integrity: sha512-3TaVTaAv2gTiMB35i3FiGJaRfwb3Pyn/j3m/bfAvGe8FB7CF6u+LMYqYlDh7reQf7UNvoTvdfAqHGmPGOSsPmA==}
     engines: {node: '>=18.12'}
@@ -3079,6 +3086,8 @@ snapshots:
     dependencies:
       fdir: 6.5.0(picomatch@4.0.3)
       picomatch: 4.0.3
+
+  together-ai@0.39.0: {}
 
   ts-api-utils@2.4.0(typescript@5.9.3):
     dependencies:
