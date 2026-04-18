@@ -26,7 +26,7 @@ export default function Layout() {
             </Authenticated>
             <NavLink
               to="/chat"
-              className={({ isActive }) => (isActive ? "" : "")}
+              className={({ isActive }) => (isActive ? "text-primary" : "")}
             >
               Chat
             </NavLink>
@@ -35,12 +35,14 @@ export default function Layout() {
         <div className="">
           <Authenticated>
             <div className="gap-2 mx-4">
-              <button
-                className=""
-                onClick={() => navigate("/create-post")}
+              <NavLink
+                to="/create-post"
+                className={({ isActive }) =>
+                  isActive ? "text-primary font-bold" : "text-base"
+                }
               >
                 My Groceries
-              </button>
+              </NavLink>
             </div>
           </Authenticated>
         </div>
@@ -76,11 +78,11 @@ export default function Layout() {
             </NavLink>
           </Unauthenticated>
         </div>
-      </nav>
+      </nav >
       <div className="flex-1 flex flex-col">
         <div></div>
         <Outlet />
       </div>
-    </div>
+    </div >
   );
 }
