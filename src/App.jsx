@@ -5,6 +5,7 @@ import HomePage from "./pages/home";
 import ChatPage from "./pages/chat";
 import PostForm from "./pages/post-form";
 import PostViewPage from "./pages/post-view";
+import './index.css'
 
 export default function App() {
   return (
