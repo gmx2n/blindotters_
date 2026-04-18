@@ -32,23 +32,20 @@ function Post({ post }) {
   const deletePost = useMutation(api.posts.deletePost);
 
   return (
-    <div className="mb-2 p-3 border rounded bg-white/80 flex flex-col items-center gap-2 w-40">
+    <div className="mb-2 flex flex-col items-center gap-2 w-20">
 
-      {/* auto photo of ingredient */}
       <img
         src={post.imageUrl}
         alt={post.name}
-        className="w-32 h-32 object-cover rounded-lg"
+        className="w-16 h-16 object-cover rounded-lg"
       />
-
-      <span className="font-semibold text-gray-800 text-center">{post.name}</span>
 
       {post.authorId === user?._id && (
         <button
           className="btn btn-xs btn-error"
           onClick={() => deletePost({ postId: post._id })}
         >
-          Delete
+          x
         </button>
       )}
     </div>
