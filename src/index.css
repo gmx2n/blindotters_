@@ -40,12 +40,12 @@
 }
 
 @font-face {
-  font-family: 'Dave';    
+  font-family: 'Dave';
   src: url('./fonts/Dave.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
 
 * {
-  font-family: 'MyFont', sans-serif;
+  font-family: 'Dave', sans-serif;
 }
