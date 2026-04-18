@@ -26,17 +26,10 @@ export default function PostViewPage() {
 
   return (
     <div className="container mx-auto p-4 flex-1 flex flex-col">
-      <h1 className="text-2xl font-bold mb-4">{post.title}</h1>
-      <p>{post.content}</p>
-      <p>expiration date: {post.address}</p>
+      <h1 className="text-2xl font-bold mb-4">{post.name}</h1>
+      <p>{post.quantity}</p>
+      <p>expiration date: {post.expiration}</p>
 
-      <div className="flex-1"></div>
-      <div>comments</div>
-      <CommentList postId={post._id} />
-      <Authenticated>
-        <div className="h-4"></div>
-        <CommentForm postId={post._id} />
-      </Authenticated>
       <Unauthenticated>
         <div>you must be logged in...</div>
       </Unauthenticated>
