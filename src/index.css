@@ -42,7 +42,7 @@
 @font-face {
   font-family: 'Dave';
   src: url('./fonts/Dave.ttf') format('truetype');
-  font-weight: normal;
+  font-weight: bold;
   font-style: normal;
 }
 
