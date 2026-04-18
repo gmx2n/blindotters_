@@ -29,15 +29,23 @@ export default function PostForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // each item becomes its own post — all uploaded at once
     await Promise.all(
-      items.map((item) =>
-        createPost({
+      items.map(async (item) => {
+        // fetch a real working image from Wikipedia based on ingredient name
+        const res = await fetch(
+          `https://en.wikipedia.org/api/rest_v1/page/summary/${item.name}`
+        );
+        const data = await res.json();
+        const imageUrl = data.thumbnail?.source ||
+          `https://placehold.co/200x200?text=${item.name}`; // fallback if no image found
+
+        await createPost({
           name: item.name,
           quantity: item.quantity,
           expiration: item.expiration,
-        })
-      )
+          imageUrl,
+        });
+      })
     );
 
     navigate("/");

@@ -8,11 +8,11 @@ export const createPost = mutation({
     name: v.string(),
     quantity: v.number(),
     expiration: v.string(),
+    imageUrl: v.string(),   // ← add this
   },
-  handler: async (ctx, { name, quantity, expiration }) => {
+  handler: async (ctx, { name, quantity, expiration, imageUrl }) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
-
     const user = await ctx.db.get(userId);
     if (!user) throw new Error("User not found");
 
@@ -20,8 +20,8 @@ export const createPost = mutation({
       name,
       quantity,
       expiration,
+      imageUrl,              // ← add this
       authorId: userId,
-      authorName: user.email!.split("@")[0],
     });
   },
 });

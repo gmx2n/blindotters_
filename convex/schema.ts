@@ -10,8 +10,8 @@ export default defineSchema({
     name: v.string(),
     quantity: v.number(),
     expiration: v.string(),
-    authorId: v.string(),
-    authorName: v.string(),
-  }),
+    imageUrl: v.string(),     // ← add this
+    authorId: v.string()
+  })
 });
 

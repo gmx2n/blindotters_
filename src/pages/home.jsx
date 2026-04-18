@@ -13,7 +13,7 @@ export default function HomePage() {
   const usersPosts = posts.filter((post) => post.authorId === user?._id);
 
   return (
-    <div className="min-h-[91vh] bg-cover bg-center bg-no-repeat"
+    <div className="min-h-[91vh] bg-center bg-no-repeat"
       style={{ backgroundImage: "url('https://media.discordapp.net/attachments/1495090293685489675/1495136667382583417/fridge_copy.jpg?ex=69e52607&is=69e3d487&hm=3fe34f836dbab665e5727e37f469ad65b328379e096975d12eac91688659dbc2&=&format=webp&width=816&height=527')" }}>
       <div className="container m-10 p-4">
         <div className="flex flex-wrap gap-2">
@@ -32,15 +32,23 @@ function Post({ post }) {
   const deletePost = useMutation(api.posts.deletePost);
 
   return (
-    <div className="mb-2 p-3 border rounded bg-white/80 flex items-center gap-3">
-      <span className="font-semibold text-gray-800">{post.name}</span>
+    <div className="mb-2 p-3 border rounded bg-white/80 flex flex-col items-center gap-2 w-40">
+
+      {/* auto photo of ingredient */}
+      <img
+        src={post.imageUrl}
+        alt={post.name}
+        className="w-32 h-32 object-cover rounded-lg"
+      />
+
+      <span className="font-semibold text-gray-800 text-center">{post.name}</span>
 
       {post.authorId === user?._id && (
         <button
-          className="btn btn-xs btn-error ml-auto"
+          className="btn btn-xs btn-error"
           onClick={() => deletePost({ postId: post._id })}
         >
-          x
+          Delete
         </button>
       )}
     </div>
