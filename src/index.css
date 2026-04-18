@@ -38,3 +38,14 @@
   --depth: 1;
   --noise: 0;
 }
+
+@font-face {
+  font-family: 'Dave';    
+  src: url('./fonts/Dave.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+* {
+  font-family: 'MyFont', sans-serif;
+}
