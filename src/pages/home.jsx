@@ -13,8 +13,8 @@ export default function HomePage() {
   const usersPosts = posts.filter((post) => post.authorId === user?._id);
 
   return (
-    <div className="min-h-[100vh] bg-cover bg-center"
-      style={{ backgroundImage: "url('https://media.discordapp.net/attachments/1495090293685489675/1495200816972300368/fridge.png?ex=69e561c6&is=69e41046&hm=9d395fa892df56a52d92c300568f410875fe78ff59ffb7a940ab3d7b2d0c76f9&=&format=webp&quality=lossless&width=816&height=527')" }}>
+    <div className="min-h-[96vh] bg-cover bg-center"
+      style={{ backgroundImage: "url('https://media.discordapp.net/attachments/1495090293685489675/1495204039632359515/fridge.png?ex=69e564c6&is=69e41346&hm=3c67a35c5ab8e1220accc94af3920f4aeb5249e364c2b54120a4cd14cc93e30e&=&format=webp&quality=lossless&width=816&height=527')" }}>
       <div className="container m-10 p-4">
         <div className="flex flex-wrap gap-2">
           {usersPosts?.map((post) => (
