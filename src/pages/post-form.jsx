@@ -53,7 +53,6 @@ export default function PostForm() {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 m-6">
-      <div className="text-lg font-semibold">Your groceries</div>
 
       {items.map((item, index) => (
         <fieldset

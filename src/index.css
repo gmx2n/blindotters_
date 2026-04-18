@@ -44,8 +44,10 @@
   src: url('./fonts/Dave.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
+
 }
 
 * {
   font-family: 'Dave', sans-serif;
+  font-size: 1.1rem;
 }
