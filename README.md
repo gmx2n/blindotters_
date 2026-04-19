@@ -1,6 +1,6 @@
 # Blind Otters: Smart Pantry & AI Chef
 
-A smart web application designed to track your fridge inventory, reduce food waste, and connect with a community. By tracking expiration dates, the app uses AI to automatically generate recipes prioritizing ingredients that are about to go bad!
+A smart web application designed to track your fridge inventory, reduce food waste, and connect with a community. By tracking expiration dates, the app uses AI to automatically generate recipes prioritizing ingredients that are about to go bad.
 
 ## Features
 
