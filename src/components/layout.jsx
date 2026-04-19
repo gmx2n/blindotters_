@@ -50,33 +50,29 @@ export default function Layout() {
 
         {/* profile */}
         <div className="ml-auto">
-          <Authenticated>
-            <div className="flex items-center gap-2">
 
-              <ul className="relative">
-                <details className="">
-                  <summary className="text-sm font-bold text-primary" onClick={(v) => setShowUserMenu(!v)}>
-                    🌱 {user?.email.split("@")[0]}
-                  </summary>
+          <div className="flex items-center gap-2">
 
-                  <div className={`rounded-t-none p-1 absolute`}>
-                    <div>
-                      <li className="text-sm bg-info text-primary p-2 "
-                        onClick={() => signOut()}><a>Sign Out</a></li>
-                    </div>
+            <ul className="relative">
+              <details className="">
+                <summary className="text-sm font-bold text-primary" onClick={(v) => setShowUserMenu(!v)}>
+                  🌱 {user?.email.split("@")[0]}
+                </summary>
+
+                <div className={`rounded-t-none p-1 absolute`}>
+                  <div>
+                    <li className="text-sm bg-info text-primary p-2 "
+                      onClick={() => signOut()}><a>Sign Out</a></li>
                   </div>
-                </details>
-              </ul>
-            </div>
-          </Authenticated>
-
-
-
-          <Unauthenticated>
+                </div>
+              </details>
+            </ul>
+          </div>
+          {/* <Unauthenticated>
             <NavLink to="/login">
               <button className="btn btn-sm">Login</button>
             </NavLink>
-          </Unauthenticated>
+          </Unauthenticated> */}
         </div>
       </nav >
       <div className="flex-1 flex flex-col">
