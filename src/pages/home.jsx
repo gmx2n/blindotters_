@@ -20,7 +20,7 @@ export default function HomePage() {
         <div className="container p-4">
           <div className="flex flex-wrap gap-2">
             {usersPosts?.map((post) => (
-              <Post key={post._id} post={post} />
+              <Post key={post._id} post={post.name.png} />
             ))}
           </div>
           <Link to="/chat" className="btn btn-success fixed bottom-6 right-6 z-50">
