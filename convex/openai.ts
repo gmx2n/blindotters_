@@ -3,7 +3,9 @@ import { v } from "convex/values";
 
 export const getRecipes = action({
   args: {
-    ingredients: v.array(v.object({ name: v.string(), daysLeft: v.number() })),
+    ingredients: v.array(
+      v.object({ name: v.string(), daysLeft: v.number() })
+    ),
     prioritizeExpiring: v.optional(v.boolean()),
   },
   handler: async (ctx, { ingredients, prioritizeExpiring }) => {
@@ -44,7 +46,6 @@ export const getRecipes = action({
   },
 });
 
-// NEW — detailed recipe steps
 export const getRecipeSteps = action({
   args: {
     recipeName: v.string(),
@@ -63,28 +64,44 @@ export const getRecipeSteps = action({
         messages: [
           {
             role: "system",
-            content: "You are a chef. Provide detailed recipe with ingredients list and step-by-step instructions. Return ONLY JSON.",
+            content: "You are a professional chef. Return ONLY valid JSON with no extra text, no markdown code blocks, no explanations.",
           },
           {
             role: "user",
-            content: `Give me full detailed recipe for "${recipeName}". Return JSON: {"ingredients": ["2 cups flour", "1 tsp salt", ...], "steps": ["Step 1 description", "Step 2 description", ...]}`,
+            content: `Write a detailed recipe for "${recipeName}". Return ONLY this JSON format: {"ingredients": ["2 cups flour", "1 tsp salt", "3 eggs"], "steps": ["Preheat the oven to 350F", "Mix the dry ingredients in a bowl", "Add eggs and stir"]}. Include 5-10 ingredients and 4-8 steps.`,
           },
         ],
       }),
     });
 
-    const data = await response.json();
-    const parsed = JSON.parse(data.choices[0].message.content || "{}");
+    if (!response.ok) {
+      throw new Error(`AI request failed: ${response.status}`);
+    }
 
-    // use Unsplash for a food photo (free, no API key)
-    const searchTerm = encodeURIComponent(recipeName);
-    parsed.imageUrl = `https://source.unsplash.com/600x400/?${searchTerm},food`;
+    const data = await response.json();
+    let content = data.choices[0].message.content || "{}";
+
+    content = content.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
+
+    let parsed;
+    try {
+      parsed = JSON.parse(content);
+    } catch (e) {
+      const match = content.match(/\{[\s\S]*\}/);
+      if (match) {
+        parsed = JSON.parse(match[0]);
+      } else {
+        parsed = { ingredients: [], steps: [content] };
+      }
+    }
+
+    const searchTerm = encodeURIComponent(recipeName.toLowerCase().replace(/[^a-z ]/g, ""));
+    parsed.imageUrl = `https://loremflickr.com/600/400/${searchTerm},food`;
 
     return parsed;
   },
 });
 
-// NEW — freeform chat
 export const chatWithAI = action({
   args: {
     message: v.string(),
@@ -99,7 +116,7 @@ export const chatWithAI = action({
     const messages = [
       {
         role: "system",
-        content: `You are a friendly chef assistant. The user has these ingredients in their fridge: ${ingredients}. Help them with recipe ideas, cooking tips, healthy suggestions, or anything food-related. Keep replies under 150 words.`,
+        content: `You are a friendly chef assistant. The user has these ingredients in their fridge: ${ingredients}. Help them with recipe ideas, cooking tips, or food questions. When suggesting a recipe, give it a clear title on the first line in **bold markdown** format like **Recipe Name**. Keep replies under 200 words.`,
       },
       ...history.map((h) => ({ role: h.role, content: h.content })),
       { role: "user", content: message },
@@ -116,6 +133,10 @@ export const chatWithAI = action({
         messages,
       }),
     });
+
+    if (!response.ok) {
+      throw new Error(`Chat request failed: ${response.status}`);
+    }
 
     const data = await response.json();
     return { reply: data.choices[0].message.content };
