@@ -1,6 +1,6 @@
 import { NavLink, Outlet } from "react-router";
 import { useAuthActions } from "@convex-dev/auth/react";
-import { Authenticated, Unauthenticated, useQuery } from "convex/react";
+import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 
 export default function Layout() {
@@ -12,33 +12,35 @@ export default function Layout() {
       <nav className="bg-info p-4 flex">
         <div>
           <div className="flex gap-4">
-            <Authenticated>
-              <NavLink
-                to="/"
-                className={({ isActive }) => (isActive ? "text-white font-bold" : "text-primary hover:text-white")}
-              >
-                My Fridge
-              </NavLink>
+            {user && (
+              <>
+                <NavLink
+                  to="/"
+                  className={({ isActive }) => (isActive ? "text-white font-bold" : "text-primary hover:text-white")}
+                >
+                  My Fridge
+                </NavLink>
 
-              <NavLink
-                to="/chat"
-                className={({ isActive }) => (isActive ? "text-white font-bold" : "text-primary hover:text-white")}
-              >
-                Chat
-              </NavLink>
+                <NavLink
+                  to="/chat"
+                  className={({ isActive }) => (isActive ? "text-white font-bold" : "text-primary hover:text-white")}
+                >
+                  Chat
+                </NavLink>
 
-              <NavLink
-                to="/create-post"
-                className={({ isActive }) => (isActive ? "text-white font-bold" : "text-primary hover:text-white")}
-              >
-                My Groceries
-              </NavLink>
-            </Authenticated>
+                <NavLink
+                  to="/create-post"
+                  className={({ isActive }) => (isActive ? "text-white font-bold" : "text-primary hover:text-white")}
+                >
+                  My Groceries
+                </NavLink>
+              </>
+            )}
           </div>
         </div>
 
         <div className="ml-auto">
-          <Authenticated>
+          {user ? (
             <div className="flex items-center gap-4">
               <span className="text-sm font-bold text-primary">
                 🌱 {user?.email?.split("@")[0] ?? "user"}
@@ -50,13 +52,11 @@ export default function Layout() {
                 Sign Out
               </button>
             </div>
-          </Authenticated>
-
-          <Unauthenticated>
+          ) : (
             <NavLink to="/login">
               <button className="btn btn-sm btn-primary">Login</button>
             </NavLink>
-          </Unauthenticated>
+          )}
         </div>
       </nav>
 
