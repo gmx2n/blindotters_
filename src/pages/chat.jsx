@@ -40,7 +40,7 @@ export default function ChatPage() {
   return (
     <div className="max-w-2xl mx-auto p-6">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">AI Recipe Suggestions</h1>
+        <h1 className="text-3xl font-bold mx-4">AI Recipe Suggestions</h1>
         <Link to="/" className="btn btn-sm">← Back to Fridge</Link>
       </div>
 
@@ -61,11 +61,10 @@ export default function ChatPage() {
               return (
                 <div
                   key={post._id}
-                  className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium border ${
-                    daysLeft <= 2
-                      ? "bg-red-100 border-red-300 text-red-700"
-                      : "bg-gray-100 border-gray-300 text-gray-700"
-                  }`}
+                  className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium border ${daysLeft <= 2
+                    ? "bg-red-100 border-red-300 text-red-700"
+                    : "bg-gray-100 border-gray-300 text-gray-700"
+                    }`}
                 >
                   <img src={post.imageUrl} alt={post.name} className="w-5 h-5 rounded-full object-cover" />
                   {post.name}

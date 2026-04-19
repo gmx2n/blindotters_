@@ -14,7 +14,7 @@ export default function HomePage() {
   return (
     <div>
       <div
-        className="min-h-screen bg-cover bg-center"
+        className="min-h-[91vh] bg-center bg-no-repeat bg-cover relative flex items-center justify-center"
         style={{ backgroundImage: "url('https://media.discordapp.net/attachments/1495090293685489675/1495205095124504626/fridge.png?ex=69e565c2&is=69e41442&hm=238170bec51185e053c4ca471f08fa0752cd3ac3a4941f84460c9cb7c6def3a7&=&format=webp&quality=lossless&width=816&height=527')" }}
       >
         <div className="container p-4">
