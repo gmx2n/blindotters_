@@ -52,106 +52,123 @@ export default function ChatPage() {
     {},
     { initialNumItems: 50 }
   );
-  const getRecipes = useAction(api.openai.getRecipes);
-  const getRecipeSteps = useAction(api.openai.getRecipeSteps);
   const chatWithAI = useAction(api.openai.chatWithAI);
-
-  const [activeTab, setActiveTab] = useState("recipes");
-  const [recipes, setRecipes] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [prioritizeExpiring, setPrioritizeExpiring] = useState(true);
-  const [expandedRecipe, setExpandedRecipe] = useState(null);
-  const [recipeSteps, setRecipeSteps] = useState({});
-  const [loadingSteps, setLoadingSteps] = useState({});
+  const getRecipeSteps = useAction(api.openai.getRecipeSteps);
 
   const [chatMessages, setChatMessages] = useState([]);
   const [chatInput, setChatInput] = useState("");
   const [chatLoading, setChatLoading] = useState(false);
+  const [selectedIngredients, setSelectedIngredients] = useState([]);
+  const [stepsData, setStepsData] = useState({});
+  const [loadingSteps, setLoadingSteps] = useState({});
 
   const usersPosts = posts?.filter((post) => post.authorId === user?._id) || [];
+
+  const sortedPosts = [...usersPosts].sort((a, b) => {
+    const aDays = Math.ceil((new Date(a.expiration).getTime() - Date.now()) / 86400000);
+    const bDays = Math.ceil((new Date(b.expiration).getTime() - Date.now()) / 86400000);
+    return aDays - bDays;
+  });
+
   const expiringItems = usersPosts.filter((p) => {
     const daysLeft = Math.ceil(
-      (new Date(p.expiration).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+      (new Date(p.expiration).getTime() - Date.now()) / 86400000
     );
     return daysLeft <= 3 && daysLeft > 0;
   });
 
-  const fetchRecipes = async () => {
-    setLoading(true);
-    setExpandedRecipe(null);
-    setRecipeSteps({});
-    try {
-      const ingredientData = usersPosts.map((post) => ({
-        name: post.name,
-        daysLeft: Math.ceil(
-          (new Date(post.expiration).getTime() - Date.now()) /
-            (1000 * 60 * 60 * 24)
-        ),
-      }));
-      const res = await getRecipes({
-        ingredients: ingredientData,
-        prioritizeExpiring,
-      });
-      setRecipes(res.recipes || []);
-    } catch (e) {
-      console.error(e);
-      alert("Error fetching recipes. Check your TOGETHER_API_KEY!");
-    }
-    setLoading(false);
+  const toggleIngredient = (name) => {
+    setSelectedIngredients((prev) =>
+      prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name]
+    );
   };
 
-  const toggleRecipeSteps = async (index, recipe) => {
-    if (expandedRecipe === index) {
-      setExpandedRecipe(null);
+  const clearSelection = () => setSelectedIngredients([]);
+
+  const useSelectedInChat = () => {
+    if (selectedIngredients.length === 0) return;
+    const msg = `Give me a recipe using these ingredients: ${selectedIngredients.join(", ")}`;
+    sendChat(msg);
+    setSelectedIngredients([]);
+  };
+
+  const useExpiringInChat = () => {
+    if (expiringItems.length === 0) {
+      sendChat("What ingredients in my fridge are expiring soon and what can I make with them?");
       return;
     }
-    setExpandedRecipe(index);
-    if (!recipeSteps[index]) {
-      setLoadingSteps({ ...loadingSteps, [index]: true });
-      try {
-        const res = await getRecipeSteps({ recipeName: recipe.name });
-        setRecipeSteps({ ...recipeSteps, [index]: res });
-      } catch (e) {
-        console.error(e);
-      }
-      setLoadingSteps({ ...loadingSteps, [index]: false });
-    }
+    const names = expiringItems.map((p) => p.name).join(", ");
+    sendChat(`Give me a recipe that uses these ingredients expiring soon: ${names}`);
   };
 
   const sendChat = async (customMessage) => {
     const msg = customMessage || chatInput;
     if (!msg.trim()) return;
     setChatInput("");
-    setChatMessages((prev) => [...prev, { role: "user", content: msg }]);
+    const newMessages = [...chatMessages, { role: "user", content: msg }];
+    setChatMessages(newMessages);
     setChatLoading(true);
+
     try {
-      const ingredientList = usersPosts.map((p) => p.name).join(", ");
+      const ingredientList = usersPosts
+        .map((p) => {
+          const days = Math.ceil(
+            (new Date(p.expiration).getTime() - Date.now()) / 86400000
+          );
+          return `${p.name} (${days} days left)`;
+        })
+        .join(", ");
+
       const res = await chatWithAI({
         message: msg,
         ingredients: ingredientList,
         history: chatMessages,
       });
-      setChatMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: res.reply },
-      ]);
+      setChatMessages([...newMessages, { role: "assistant", content: res.reply }]);
     } catch (e) {
-      setChatMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: "Sorry, something went wrong. Try again!" },
+      console.error(e);
+      setChatMessages([
+        ...newMessages,
+        { role: "assistant", content: "Sorry, something went wrong. Check your TOGETHER_API_KEY!" },
       ]);
     }
     setChatLoading(false);
   };
 
+  const extractRecipeName = (content) => {
+    const boldMatch = content.match(/\*\*([^*]+)\*\*/);
+    if (boldMatch) return boldMatch[1].trim();
+    const firstLine = content.split("\n")[0].replace(/[#*:]/g, "").trim();
+    return firstLine.length > 3 && firstLine.length < 60 ? firstLine : null;
+  };
+
+  const loadRecipeSteps = async (messageIndex, recipeName) => {
+    if (stepsData[messageIndex]) {
+      setStepsData((prev) => {
+        const copy = { ...prev };
+        delete copy[messageIndex];
+        return copy;
+      });
+      return;
+    }
+    setLoadingSteps((prev) => ({ ...prev, [messageIndex]: true }));
+    try {
+      const res = await getRecipeSteps({ recipeName });
+      setStepsData((prev) => ({ ...prev, [messageIndex]: res }));
+    } catch (e) {
+      console.error(e);
+      alert("Couldn't load recipe steps. Try again!");
+    }
+    setLoadingSteps((prev) => ({ ...prev, [messageIndex]: false }));
+  };
+
   return (
-    <div className="max-w-4xl mx-auto p-4 md:p-6">
-      {/* HEADER */}
-      <div className="flex items-center justify-between mb-6">
+    <div className="max-w-7xl mx-auto p-4 h-[92vh] flex flex-col">
+      <div className="flex items-center justify-between mb-4">
         <div>
-          <h1 className="text-3xl font-bold">👨‍🍳 Chef AI</h1>
-          <p className="text-sm text-gray-500">
-            {usersPosts.length} ingredients in your fridge
+          <h1 className="text-2xl font-bold">👨‍🍳 Chef AI</h1>
+          <p className="text-xs text-gray-500">
+            {usersPosts.length} ingredients
             {expiringItems.length > 0 && (
               <span className="ml-2 text-red-500 font-bold">
                 • {expiringItems.length} expiring soon
@@ -159,297 +176,247 @@ export default function ChatPage() {
             )}
           </p>
         </div>
-        <Link to="/" className="btn btn-sm">← Back to Fridge</Link>
+        <Link to="/" className="btn btn-sm">← Back</Link>
       </div>
 
-      {/* TABS */}
-      <div className="flex border-b-2 border-gray-200 mb-6">
-        <button
-          onClick={() => setActiveTab("recipes")}
-          className={`px-6 py-3 font-semibold transition ${
-            activeTab === "recipes"
-              ? "border-b-4 border-success text-success -mb-0.5"
-              : "text-gray-500 hover:text-gray-800"
-          }`}
-        >
-          🍳 Recipes
-        </button>
-        <button
-          onClick={() => setActiveTab("chat")}
-          className={`px-6 py-3 font-semibold transition ${
-            activeTab === "chat"
-              ? "border-b-4 border-success text-success -mb-0.5"
-              : "text-gray-500 hover:text-gray-800"
-          }`}
-        >
-          💬 Chat
-        </button>
-      </div>
-
-      {/* RECIPES TAB */}
-      {activeTab === "recipes" && (
-        <div>
-          {/* INGREDIENTS PREVIEW */}
-          {usersPosts.length === 0 ? (
-            <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl p-8 text-center">
-              <p className="text-gray-500 mb-3">Your fridge is empty!</p>
-              <Link to="/create-post" className="btn btn-primary">
-                Add ingredients
-              </Link>
-            </div>
-          ) : (
-            <>
-              <details className="mb-6 bg-base-200 rounded-xl p-4" open>
-                <summary className="font-semibold cursor-pointer">
-                  Your ingredients ({usersPosts.length})
-                </summary>
-                <div className="flex flex-wrap gap-2 mt-3">
-                  {usersPosts.map((post) => {
-                    const daysLeft = Math.ceil(
-                      (new Date(post.expiration).getTime() - Date.now()) /
-                        (1000 * 60 * 60 * 24)
-                    );
-                    const imgSrc = getLocalImage(post.name) || post.imageUrl;
-                    return (
-                      <div
-                        key={post._id}
-                        className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm border ${
-                          daysLeft <= 2
-                            ? "bg-red-100 border-red-300 text-red-700"
-                            : "bg-white border-gray-300"
-                        }`}
-                      >
-                        <img src={imgSrc} alt={post.name} className="w-5 h-5 rounded-full object-cover" />
-                        {post.name}
-                        <span className="text-xs opacity-70">
-                          {daysLeft <= 0 ? "Expired" : `${daysLeft}d`}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </details>
-
-              {/* GET RECIPES SECTION */}
-              <div className="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-2xl p-5 mb-6">
-                <div className="flex items-center justify-between mb-3">
-                  <div>
-                    <h3 className="font-bold text-lg">Generate recipes</h3>
-                    <p className="text-sm text-gray-600">AI will suggest 3 dishes</p>
-                  </div>
-                  <button
-                    onClick={fetchRecipes}
-                    disabled={loading || usersPosts.length === 0}
-                    className="btn btn-success"
-                  >
-                    {loading ? (
-                      <>
-                        <span className="loading loading-spinner loading-sm"></span>
-                        Thinking...
-                      </>
-                    ) : (
-                      <>✨ Generate</>
-                    )}
-                  </button>
-                </div>
-
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={prioritizeExpiring}
-                    onChange={(e) => setPrioritizeExpiring(e.target.checked)}
-                    className="checkbox checkbox-sm checkbox-success"
-                  />
-                  <span className="text-sm">
-                    Focus on ingredients expiring soon
-                    {expiringItems.length > 0 && (
-                      <span className="ml-1 text-red-500 font-bold">
-                        ({expiringItems.length})
-                      </span>
-                    )}
-                  </span>
-                </label>
-              </div>
-
-              {/* RECIPE CARDS */}
-              {recipes.length > 0 && (
-                <div className="space-y-3">
-                  {recipes.map((r, i) => (
-                    <div
-                      key={i}
-                      className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition"
-                    >
-                      <button
-                        onClick={() => toggleRecipeSteps(i, r)}
-                        className="w-full p-5 text-left hover:bg-gray-50 transition"
-                      >
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex-1">
-                            <h3 className="font-bold text-lg text-gray-800">{r.name}</h3>
-                            <p className="text-gray-600 text-sm mt-1">{r.instructions}</p>
-                            {r.using_soon_to_expire?.length > 0 && (
-                              <div className="flex flex-wrap gap-1 mt-2">
-                                {r.using_soon_to_expire.map((ing) => (
-                                  <span
-                                    key={ing}
-                                    className="bg-red-100 text-red-700 text-xs px-2 py-0.5 rounded-full font-medium"
-                                  >
-                                    ⚠ {ing}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                          <div className="text-2xl text-gray-400 flex-shrink-0">
-                            {expandedRecipe === i ? "−" : "+"}
-                          </div>
-                        </div>
-                      </button>
-
-                      {/* EXPANDED */}
-                      {expandedRecipe === i && (
-                        <div className="border-t border-gray-100 p-5 bg-gray-50">
-                          {loadingSteps[i] ? (
-                            <div className="flex items-center gap-2 text-gray-500">
-                              <span className="loading loading-spinner loading-sm"></span>
-                              Writing recipe...
-                            </div>
-                          ) : recipeSteps[i] ? (
-                            <div className="grid md:grid-cols-2 gap-5">
-                              {recipeSteps[i].imageUrl && (
-                                <img
-                                  src={recipeSteps[i].imageUrl}
-                                  alt={r.name}
-                                  className="w-full h-48 md:h-full object-cover rounded-xl"
-                                />
-                              )}
-                              <div>
-                                <h4 className="font-bold mb-2 text-sm uppercase text-gray-500">
-                                  Ingredients
-                                </h4>
-                                <ul className="space-y-1 mb-4 text-sm">
-                                  {recipeSteps[i].ingredients?.map((ing, idx) => (
-                                    <li key={idx} className="flex gap-2">
-                                      <span className="text-success">•</span>
-                                      <span>{ing}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-
-                                <h4 className="font-bold mb-2 text-sm uppercase text-gray-500">
-                                  Steps
-                                </h4>
-                                <ol className="space-y-2 text-sm">
-                                  {recipeSteps[i].steps?.map((step, idx) => (
-                                    <li key={idx} className="flex gap-2">
-                                      <span className="font-bold text-success flex-shrink-0">
-                                        {idx + 1}.
-                                      </span>
-                                      <span>{step}</span>
-                                    </li>
-                                  ))}
-                                </ol>
-                              </div>
-                            </div>
-                          ) : null}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </>
-          )}
-        </div>
-      )}
-
-      {/* CHAT TAB */}
-      {activeTab === "chat" && (
-        <div className="bg-white border border-gray-200 rounded-2xl shadow-sm flex flex-col h-[70vh]">
-          {/* CHAT MESSAGES */}
-          <div className="flex-1 overflow-y-auto p-5 space-y-3">
+      <div className="flex-1 flex gap-4 overflow-hidden">
+        <div className="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm flex flex-col overflow-hidden">
+          <div className="flex-1 overflow-y-auto p-5 space-y-4">
             {chatMessages.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center">
                 <div className="text-5xl mb-3">👨‍🍳</div>
                 <h3 className="font-bold text-lg mb-2">Hi! I'm Chef AI</h3>
-                <p className="text-gray-500 text-sm mb-5 max-w-sm">
-                  Ask me anything about cooking with what you have in your fridge!
+                <p className="text-gray-500 text-sm mb-6 max-w-sm">
+                  Ask me anything or click an ingredient on the right to add it to your message.
                 </p>
-
-                {/* SUGGESTION CHIPS */}
                 <div className="flex flex-wrap gap-2 justify-center max-w-md">
                   {[
                     "What's a healthy dinner I can make?",
-                    "Can you make something with just eggs?",
-                    "What expires soonest?",
                     "Suggest a 15-minute meal",
-                  ].map((suggestion) => (
+                    "Give me a comfort food recipe",
+                    "What can I bake?",
+                  ].map((s) => (
                     <button
-                      key={suggestion}
-                      onClick={() => sendChat(suggestion)}
+                      key={s}
+                      onClick={() => sendChat(s)}
                       className="text-xs px-3 py-2 rounded-full bg-gray-100 hover:bg-gray-200 transition"
                     >
-                      {suggestion}
+                      {s}
                     </button>
                   ))}
                 </div>
               </div>
             ) : (
-              <>
-                {chatMessages.map((msg, i) => (
-                  <div
-                    key={i}
-                    className={`flex ${
-                      msg.role === "user" ? "justify-end" : "justify-start"
-                    }`}
-                  >
-                    <div
-                      className={`max-w-[80%] p-3 rounded-2xl ${
-                        msg.role === "user"
-                          ? "bg-success text-white rounded-br-sm"
-                          : "bg-gray-100 text-gray-800 rounded-bl-sm"
-                      }`}
-                    >
-                      <div className="whitespace-pre-line text-sm">{msg.content}</div>
-                    </div>
-                  </div>
-                ))}
-                {chatLoading && (
-                  <div className="flex justify-start">
-                    <div className="bg-gray-100 p-3 rounded-2xl rounded-bl-sm">
-                      <div className="flex gap-1">
-                        <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></span>
-                        <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: "0.1s"}}></span>
-                        <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: "0.2s"}}></span>
+              chatMessages.map((msg, i) => {
+                const recipeName =
+                  msg.role === "assistant" ? extractRecipeName(msg.content) : null;
+                return (
+                  <div key={i}>
+                    <div className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                      <div
+                        className={`max-w-[85%] p-3 rounded-2xl ${
+                          msg.role === "user"
+                            ? "bg-success text-white rounded-br-sm"
+                            : "bg-gray-100 text-gray-800 rounded-bl-sm"
+                        }`}
+                      >
+                        <div className="whitespace-pre-line text-sm">{msg.content}</div>
+                        {msg.role === "assistant" && recipeName && (
+                          <button
+                            onClick={() => loadRecipeSteps(i, recipeName)}
+                            className="btn btn-xs btn-outline mt-3"
+                            disabled={loadingSteps[i]}
+                          >
+                            {loadingSteps[i]
+                              ? "Loading..."
+                              : stepsData[i]
+                              ? "Hide steps"
+                              : "📖 Step-by-step recipe"}
+                          </button>
+                        )}
                       </div>
                     </div>
+
+                    {stepsData[i] && (
+                      <div className="mt-3 bg-amber-50 border border-amber-200 rounded-2xl p-4">
+                        <h4 className="font-bold text-lg mb-3">{recipeName} — Full Recipe</h4>
+                        {stepsData[i].imageUrl && (
+                          <img
+                            src={stepsData[i].imageUrl}
+                            alt={recipeName}
+                            className="w-full h-48 object-cover rounded-xl mb-4"
+                            onError={(e) => (e.target.style.display = "none")}
+                          />
+                        )}
+                        {stepsData[i].ingredients?.length > 0 && (
+                          <>
+                            <h5 className="font-bold mb-2 text-sm uppercase text-gray-600">Ingredients</h5>
+                            <ul className="space-y-1 mb-4 text-sm">
+                              {stepsData[i].ingredients.map((ing, idx) => (
+                                <li key={idx} className="flex gap-2">
+                                  <span className="text-amber-600">•</span>
+                                  <span>{ing}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </>
+                        )}
+                        {stepsData[i].steps?.length > 0 && (
+                          <>
+                            <h5 className="font-bold mb-2 text-sm uppercase text-gray-600">Steps</h5>
+                            <ol className="space-y-2 text-sm">
+                              {stepsData[i].steps.map((step, idx) => (
+                                <li key={idx} className="flex gap-2">
+                                  <span className="font-bold text-amber-600 flex-shrink-0">{idx + 1}.</span>
+                                  <span>{step}</span>
+                                </li>
+                              ))}
+                            </ol>
+                          </>
+                        )}
+                      </div>
+                    )}
                   </div>
-                )}
-              </>
+                );
+              })
+            )}
+            {chatLoading && (
+              <div className="flex justify-start">
+                <div className="bg-gray-100 p-3 rounded-2xl rounded-bl-sm">
+                  <div className="flex gap-1">
+                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></span>
+                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></span>
+                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></span>
+                  </div>
+                </div>
+              </div>
             )}
           </div>
 
-          {/* CHAT INPUT */}
-          <div className="border-t border-gray-200 p-3 flex gap-2">
-            <input
-              type="text"
-              value={chatInput}
-              onChange={(e) => setChatInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && sendChat()}
-              placeholder="Ask Chef AI..."
-              className="input input-bordered flex-1"
-              disabled={chatLoading}
-            />
-            <button
-              onClick={() => sendChat()}
-              disabled={chatLoading || !chatInput.trim()}
-              className="btn btn-success"
-            >
-              Send
-            </button>
+          {selectedIngredients.length > 0 && (
+            <div className="border-t border-gray-100 p-3 bg-green-50 flex items-center gap-2">
+              <span className="text-xs font-bold text-green-700">
+                {selectedIngredients.length} selected:
+              </span>
+              <div className="flex flex-wrap gap-1 flex-1">
+                {selectedIngredients.map((n) => (
+                  <span key={n} className="text-xs bg-white px-2 py-1 rounded-full border border-green-200">
+                    {n}
+                  </span>
+                ))}
+              </div>
+              <button onClick={clearSelection} className="btn btn-xs btn-ghost">Clear</button>
+              <button onClick={useSelectedInChat} className="btn btn-xs btn-success">Send →</button>
+            </div>
+          )}
+
+          <div className="border-t border-gray-200 p-3">
+            <div className="flex gap-2 mb-2 flex-wrap">
+              <button
+                onClick={useExpiringInChat}
+                className="btn btn-xs bg-red-100 text-red-700 border-red-200 hover:bg-red-200"
+                disabled={chatLoading}
+              >
+                ⚠️ Use expiring ingredients
+              </button>
+              <button
+                onClick={() => sendChat("Give me a healthy recipe idea")}
+                className="btn btn-xs btn-outline"
+                disabled={chatLoading}
+              >
+                🥗 Something healthy
+              </button>
+              <button
+                onClick={() => sendChat("Give me a quick 20-minute meal")}
+                className="btn btn-xs btn-outline"
+                disabled={chatLoading}
+              >
+                ⏱ Quick meal
+              </button>
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && sendChat()}
+                placeholder="Ask Chef AI anything..."
+                className="input input-bordered flex-1"
+                disabled={chatLoading}
+              />
+              <button
+                onClick={() => sendChat()}
+                disabled={chatLoading || !chatInput.trim()}
+                className="btn btn-success"
+              >
+                Send
+              </button>
+            </div>
           </div>
         </div>
-      )}
+
+        <div className="w-80 bg-white border border-gray-200 rounded-2xl shadow-sm flex flex-col overflow-hidden">
+          <div className="p-4 border-b border-gray-100">
+            <h2 className="font-bold text-lg">🥬 Your Fridge</h2>
+            <p className="text-xs text-gray-500">Click to add to chat</p>
+          </div>
+
+          <div className="flex-1 overflow-y-auto p-3 space-y-2">
+            {sortedPosts.length === 0 ? (
+              <div className="text-center p-6">
+                <p className="text-gray-400 text-sm mb-3">Fridge is empty!</p>
+                <Link to="/create-post" className="btn btn-sm btn-primary">
+                  Add ingredients
+                </Link>
+              </div>
+            ) : (
+              sortedPosts.map((post) => {
+                const daysLeft = Math.ceil(
+                  (new Date(post.expiration).getTime() - Date.now()) / 86400000
+                );
+                const imgSrc = getLocalImage(post.name) || post.imageUrl;
+                const isSelected = selectedIngredients.includes(post.name);
+                const isExpiring = daysLeft <= 2;
+
+                return (
+                  <button
+                    key={post._id}
+                    onClick={() => toggleIngredient(post.name)}
+                    className={`w-full flex items-center gap-3 p-2 rounded-xl border-2 transition text-left ${
+                      isSelected
+                        ? "bg-green-100 border-green-400"
+                        : isExpiring
+                        ? "bg-red-50 border-red-200 hover:bg-red-100"
+                        : "bg-gray-50 border-gray-200 hover:bg-gray-100"
+                    }`}
+                  >
+                    <img src={imgSrc} alt={post.name} className="w-10 h-10 object-contain flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-sm truncate">{post.name}</div>
+                      <div className={`text-xs ${isExpiring ? "text-red-600 font-bold" : "text-gray-500"}`}>
+                        {daysLeft <= 0
+                          ? "Expired!"
+                          : daysLeft === 1
+                          ? "Expires tomorrow"
+                          : `${daysLeft} days left`}
+                      </div>
+                    </div>
+                    {isSelected && <span className="text-green-600 text-lg">✓</span>}
+                  </button>
+                );
+              })
+            )}
+          </div>
+
+          {sortedPosts.length > 0 && (
+            <div className="p-3 border-t border-gray-100">
+              <Link to="/create-post" className="btn btn-sm btn-outline w-full">
+                + Add more
+              </Link>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
