@@ -102,7 +102,7 @@ export default function ChatPage() {
                   key={ing}
                   className="bg-orange-200 text-orange-800 text-xs px-2 py-1 rounded-full font-bold"
                 >
-                  ⚠️ Uses: {ing}
+                  Uses: {ing}
                 </span>
               ))}
             </div>
