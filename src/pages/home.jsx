@@ -23,7 +23,7 @@ export default function HomePage() {
               <Post key={post._id} post={post} />
             ))}
           </div>
-          <Link to="/chat" className="btn btn-success mx-4">
+          <Link to="/chat" className="btn btn-success fixed bottom-6 right-6 z-50">
             🍳 Get AI Recipes
           </Link>
         </div>
