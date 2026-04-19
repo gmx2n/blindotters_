@@ -45,7 +45,7 @@ export default function HomePage() {
       {/* LEFT DOOR — liquids & sauces */}
       <div className="absolute top-[20%] left-[5%] w-[15%] flex flex-col gap-3 items-center">
         {leftDoor.map((post) => (
-          <PostItem key={post._id} post={post} currentUserId={user?._id} />
+          <PostItem className="w-20" key={post._id} post={post} currentUserId={user?._id} />
         ))}
       </div>
 
