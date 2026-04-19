@@ -6,41 +6,43 @@ import { api } from "../../convex/_generated/api";
 export default function Layout() {
   const { signOut } = useAuthActions();
   const user = useQuery(api.users.getUser);
-
   console.log("Layout user:", user);
 
   return (
     <div className="min-h-screen flex flex-col">
-      <nav className="bg-info p-4 flex">
-        <div>
-          <div className="flex gap-4">
-            {user && (
-              <>
-                <NavLink
-                  to="/"
-                  className={({ isActive }) => (isActive ? "text-white font-bold" : "text-primary hover:text-white")}
-                >
-                  My Fridge
-                </NavLink>
-                <NavLink
-                  to="/create-post"
-                  className={({ isActive }) => (isActive ? "text-white font-bold" : "text-primary hover:text-white")}
-                >
-                  Stock Up
-                </NavLink>
-                <NavLink
-                  to="/chat"
-                  className={({ isActive }) => (isActive ? "text-white font-bold" : "text-primary hover:text-white")}
-                >
-                  Chat
-                </NavLink>
-
-
-              </>
-            )}
-          </div>
+      <nav className="bg-info p-4 flex items-center relative">
+        {/* LEFT: nav links */}
+        <div className="flex gap-4">
+          {user && (
+            <>
+              <NavLink
+                to="/"
+                className={({ isActive }) => (isActive ? "text-white font-bold" : "text-primary hover:text-white")}
+              >
+                My Fridge
+              </NavLink>
+              <NavLink
+                to="/create-post"
+                className={({ isActive }) => (isActive ? "text-white font-bold" : "text-primary hover:text-white")}
+              >
+                Stock Up
+              </NavLink>
+              <NavLink
+                to="/chat"
+                className={({ isActive }) => (isActive ? "text-white font-bold" : "text-primary hover:text-white")}
+              >
+                Chat
+              </NavLink>
+            </>
+          )}
         </div>
 
+        {/* CENTER: website title */}
+        <h1 className="absolute left-1/2 -translate-x-1/2 text-3xl font-bold text-white tracking-wide">
+          SmartFridge
+        </h1>
+
+        {/* RIGHT: user menu */}
         <div className="ml-auto">
           {user ? (
             <div className="flex items-center gap-4">
