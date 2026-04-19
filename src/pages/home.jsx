@@ -18,21 +18,18 @@ function isLiquid(name) {
 // maps ingredient names to files in the public folder
 const LOCAL_IMAGES = {
   "apple juice": "/apple juice.png",
-  "apple": "/apple.png",
   "asparagus": "/asparagus.jpg",
-  "avocado": "/avocado.jpg",
   "beets": "/beets.png",
   "bread": "/bread.png",
   "brocolli": "/brocolli.png",
   "broccoli": "/brocolli.png",
   "carrot": "/carrot.png",
   "carrots": "/carrot.png",
-  "chicken": "/chicken.jpg",
   "corn": "/corn.png",
   "egg": "/egg.png",
   "eggs": "/egg.png",
   "eggplant": "/eggplant.png",
-  "berries": "/fruit .png",
+  "fruit": "/fruit .png",
   "green onion": "/green onion.png",
   "green onions": "/green onion.png",
   "lettuce": "/lettuce.png",
@@ -42,7 +39,6 @@ const LOCAL_IMAGES = {
   "potatoes": "/potato.png",
   "red pepper": "/redpepper.png",
   "redpepper": "/redpepper.png",
-  "strawberry": "/strawberry.png",
   "tomato": "/tomato.png",
   "tomatoes": "/tomato.png",
   "olive oil": "/virginoil (1).png",
@@ -118,10 +114,9 @@ export default function HomePage() {
 function PostItem({ post, currentUserId }) {
   const deletePost = useMutation(api.posts.deletePost);
   const [hover, setHover] = useState(false);
-
-  const addedDate = new Date(post._creationTime).toLocaleDateString();
-  const expirationDate = post.expiration;
   const amount = post.quantity;
+  const addedDate = new Date(post._creationTime).toLocaleDateString();
+  const expirationDate = post.expiration
     ? new Date(post.expiration).toLocaleDateString()
     : "n/a";
 
@@ -136,9 +131,9 @@ function PostItem({ post, currentUserId }) {
       onMouseLeave={() => setHover(false)}
     >
       {hover && (
-        <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-secondary text-white text-xs rounded-lg p-2 shadow-lg whitespace-nowrap z-50">
+        <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs rounded-lg p-2 shadow-lg whitespace-nowrap z-50">
           <div className="font-bold">{post.name}</div>
-          <div>Quantity: {amount}</div>
+          <div>Amount: {amount}</div>
           <div>Expires: {expirationDate}</div>
           <div>Added: {addedDate}</div>
         </div>
