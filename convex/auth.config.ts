@@ -8,4 +8,3 @@ export default {
     },
   ],
 } satisfies AuthConfig;
-S
