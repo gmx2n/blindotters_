@@ -19,7 +19,7 @@ export default function Layout() {
             <Authenticated>
               <NavLink
                 to="/"
-                className={({ isActive }) => (isActive ? "text-white" : "text-primary")}
+                className={({ isActive }) => (isActive ? "text-white font-bold" : "text-primary hover:text-white")}
               >
                 My Fridge
               </NavLink>
@@ -38,7 +38,7 @@ export default function Layout() {
               <NavLink
                 to="/create-post"
                 className={({ isActive }) =>
-                  isActive ? "text-white font-bold" : "text-primary"
+                  isActive ? "text-white font-bold" : "text-primary hover:text-white"
                 }
               >
                 My Groceries
