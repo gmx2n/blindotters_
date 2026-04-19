@@ -26,7 +26,7 @@ export default function Layout() {
             </Authenticated>
             <NavLink
               to="/chat"
-              className={({ isActive }) => (isActive ? "text-white font-bold" : "text-success")}
+              className={({ isActive }) => (isActive ? "text-white font-bold" : "text-primary")}
             >
               Chat
             </NavLink>
