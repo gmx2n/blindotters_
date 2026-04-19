@@ -1,11 +1,15 @@
 import { useState } from "react";
-import { useQuery, useAction } from "convex/react";
+import { usePaginatedQuery, useQuery, useAction } from "convex/react";  // ← add usePaginatedQuery
 import { api } from "../../convex/_generated/api";
 import { Link } from "react-router";
 
 export default function ChatPage() {
   const user = useQuery(api.users.getUser);
-  const { results: posts } = useQuery(api.posts.getPosts, {}, { initialNumItems: 50 }) || { results: [] };
+  const { results: posts } = usePaginatedQuery(   // ← change useQuery to usePaginatedQuery
+    api.posts.getPosts,
+    {},
+    { initialNumItems: 50 }
+  );
   const getRecipes = useAction(api.openai.getRecipes);
 
   const [recipes, setRecipes] = useState([]);
