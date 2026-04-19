@@ -26,18 +26,25 @@ export default function PostForm() {
     setItems(updated);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
+  try {
     await Promise.all(
       items.map(async (item) => {
-        // fetch a real working image from Wikipedia based on ingredient name
-        const res = await fetch(
-          `https://en.wikipedia.org/api/rest_v1/page/summary/${item.name}`
-        );
-        const data = await res.json();
-        const imageUrl = data.thumbnail?.source ||
-          `https://placehold.co/200x200?text=${item.name}`; // fallback if no image found
+        // try Wikipedia for image
+        let imageUrl = `https://placehold.co/200x200?text=${item.name}`;
+        try {
+          const res = await fetch(
+            `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(item.name)}`
+          );
+          if (res.ok) {
+            const data = await res.json();
+            imageUrl = data.thumbnail?.source || imageUrl;
+          }
+        } catch {
+          // wikipedia failed, use placeholder fallback
+        }
 
         await createPost({
           name: item.name,
@@ -49,7 +56,10 @@ export default function PostForm() {
     );
 
     navigate("/");
-  };
+  } catch (err) {
+    alert("Failed to add items: " + err.message);  // ← now shows actual error
+  }
+};
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 m-6">
