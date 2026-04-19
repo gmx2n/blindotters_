@@ -7,6 +7,8 @@ export default function Layout() {
   const { signOut } = useAuthActions();
   const user = useQuery(api.users.getUser);
 
+  console.log("Layout user:", user);
+
   return (
     <div className="min-h-screen flex flex-col">
       <nav className="bg-info p-4 flex">
