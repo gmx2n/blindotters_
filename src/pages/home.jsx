@@ -18,7 +18,9 @@ function isLiquid(name) {
 // maps ingredient names to files in the public folder
 const LOCAL_IMAGES = {
   "apple juice": "/apple juice.png",
-  "asparagus": "/asparagus.jpg",
+  "apple": "/apple.png",
+  "asparagus": "/asparagus.png",
+  "avocado": "/avocado.png",
   "beets": "/beets.png",
   "bread": "/bread.png",
   "brocolli": "/brocolli.png",
@@ -26,6 +28,7 @@ const LOCAL_IMAGES = {
   "carrot": "/carrot.png",
   "carrots": "/carrot.png",
   "corn": "/corn.png",
+  "chicken": "/chicken.png",
   "egg": "/egg.png",
   "eggs": "/egg.png",
   "eggplant": "/eggplant.png",
@@ -39,6 +42,7 @@ const LOCAL_IMAGES = {
   "potatoes": "/potato.png",
   "red pepper": "/redpepper.png",
   "redpepper": "/redpepper.png",
+  "strawberry": "/strawberry.png",
   "tomato": "/tomato.png",
   "tomatoes": "/tomato.png",
   "olive oil": "/virginoil (1).png",
