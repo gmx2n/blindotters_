@@ -14,7 +14,7 @@ export default function HomePage() {
     return (
       <div>
         {/* This assumes your images are in the public folder */}
-        <img src={`/${imageName}.png`} alt={imageName} />
+        <img className="h-12" src={`/${imageName}.png`} alt={imageName} />
       </div>
     );
   };
