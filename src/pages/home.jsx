@@ -120,7 +120,8 @@ function PostItem({ post, currentUserId }) {
   const [hover, setHover] = useState(false);
 
   const addedDate = new Date(post._creationTime).toLocaleDateString();
-  const expirationDate = post.expiration
+  const expirationDate = post.expiration;
+  const amount = post.quantity;
     ? new Date(post.expiration).toLocaleDateString()
     : "n/a";
 
@@ -135,8 +136,9 @@ function PostItem({ post, currentUserId }) {
       onMouseLeave={() => setHover(false)}
     >
       {hover && (
-        <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs rounded-lg p-2 shadow-lg whitespace-nowrap z-50">
+        <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-secondary text-white text-xs rounded-lg p-2 shadow-lg whitespace-nowrap z-50">
           <div className="font-bold">{post.name}</div>
+          <div>Quantity: {amount}</div>
           <div>Expires: {expirationDate}</div>
           <div>Added: {addedDate}</div>
         </div>
