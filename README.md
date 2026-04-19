@@ -7,7 +7,6 @@ A smart web application designed to track your fridge inventory, reduce food was
 * **Fridge/Pantry Tracker:** Add ingredients, quantities, images, and expiration dates.
 * **Smart Expiration Alerts:** Visually flags ingredients that are expiring in 2 days or less.
 * **AI Chef Recipe Generator:** Uses AI to read your current inventory and suggest recipes that specifically utilize your soon-to-expire food.
-* **Real-Time Community Chat:** A live, global chatroom where users can discuss recipes, share cooking tips, and hang out. 
 * **Authentication:** Secure user login, ensuring your fridge data remains private while letting you safely chat in the community.
 
 ---
