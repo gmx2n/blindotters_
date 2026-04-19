@@ -97,14 +97,19 @@ export default function ChatPage() {
             <h3 className="font-bold text-xl text-green-800">{r.name}</h3>
             <p className="text-gray-700 mt-3 whitespace-pre-line">{r.instructions}</p>
             <div className="mt-4 flex gap-2 flex-wrap">
-              {r.using_soon_to_expire?.map((ing) => (
-                <span
-                  key={ing}
-                  className="bg-orange-200 text-orange-800 text-xs px-2 py-1 rounded-full font-bold"
-                >
-                  Uses: {ing}
-                </span>
-              ))}
+              {r.using_soon_to_expire?.length > 0 && (
+                <div className="flex flex-wrap gap-1 items-center">
+                  <span className="text-xs font-bold">Uses:</span>
+                  {r.using_soon_to_expire.map((ing) => (
+                    <span
+                      key={ing}
+                      className="bg-secondary text-xs px-2 py-1 rounded-full font-bold"
+                    >
+                      {ing}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         ))}
