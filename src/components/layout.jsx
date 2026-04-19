@@ -16,14 +16,14 @@ export default function Layout() {
         {/* menus */}
         <div className="">
           <div className="flex gap-4">
-            <Authenticated>
-              <NavLink
-                to="/"
-                className={({ isActive }) => (isActive ? "text-white font-bold" : "text-primary hover:text-white")}
-              >
-                My Fridge
-              </NavLink>
-            </Authenticated>
+
+            <NavLink
+              to="/"
+              className={({ isActive }) => (isActive ? "text-white font-bold" : "text-primary hover:text-white")}
+            >
+              My Fridge
+            </NavLink>
+
             <NavLink
               to="/chat"
               className={({ isActive }) => (isActive ? "text-white font-bold" : "text-primary hover:text-white")}
@@ -33,18 +33,18 @@ export default function Layout() {
           </div>
         </div>
         <div className="">
-          <Authenticated>
-            <div className="gap-2 mx-4">
-              <NavLink
-                to="/create-post"
-                className={({ isActive }) =>
-                  (isActive ? "text-white font-bold" : "text-primary hover:text-white")
-                }
-              >
-                My Groceries
-              </NavLink>
-            </div>
-          </Authenticated>
+
+          <div className="gap-2 mx-4">
+            <NavLink
+              to="/create-post"
+              className={({ isActive }) =>
+                (isActive ? "text-white font-bold" : "text-primary hover:text-white")
+              }
+            >
+              My Groceries
+            </NavLink>
+          </div>
+
         </div>
 
 
