@@ -22,7 +22,12 @@ export default function Layout() {
                 >
                   My Fridge
                 </NavLink>
-
+                <NavLink
+                  to="/create-post"
+                  className={({ isActive }) => (isActive ? "text-white font-bold" : "text-primary hover:text-white")}
+                >
+                  My Groceries
+                </NavLink>
                 <NavLink
                   to="/chat"
                   className={({ isActive }) => (isActive ? "text-white font-bold" : "text-primary hover:text-white")}
@@ -30,12 +35,7 @@ export default function Layout() {
                   Chat
                 </NavLink>
 
-                <NavLink
-                  to="/create-post"
-                  className={({ isActive }) => (isActive ? "text-white font-bold" : "text-primary hover:text-white")}
-                >
-                  My Groceries
-                </NavLink>
+
               </>
             )}
           </div>
