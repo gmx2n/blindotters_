@@ -135,7 +135,7 @@ function PostItem({ post, currentUserId }) {
       onMouseLeave={() => setHover(false)}
     >
       {hover && (
-        <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs rounded-lg p-2 shadow-lg whitespace-nowrap z-50">
+        <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-secondary text-white text-xs rounded-lg p-2 shadow-lg whitespace-nowrap z-50">
           <div className="font-bold">{post.name}</div>
           <div>Amount: {amount}</div>
           <div>Expires: {expirationDate}</div>
