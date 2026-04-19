@@ -85,21 +85,21 @@ export default function HomePage() {
       }}
     >
       {/* LEFT DOOR */}
-      <div className="absolute top-[25%] left-[5%] w-[15%] flex flex-col gap-4 items-center">
+      <div className="absolute top-[28%] left-[5%] w-[15%] flex flex-col gap-4 items-center">
         {leftDoor.map((post) => (
           <PostItem key={post._id} post={post} currentUserId={user?._id} />
         ))}
       </div>
 
       {/* CENTER */}
-      <div className="absolute top-[21%] left-[25%] w-[50%] flex flex-wrap gap-4 justify-center content-start">
+      <div className="absolute top-[25%] left-[25%] w-[50%] flex flex-wrap gap-4 justify-center content-start">
         {solids.map((post) => (
           <PostItem key={post._id} post={post} currentUserId={user?._id} />
         ))}
       </div>
 
       {/* RIGHT DOOR */}
-      <div className="absolute top-[25%] right-[5%] w-[15%] flex flex-col gap-4 items-center">
+      <div className="absolute top-[28%] right-[5%] w-[15%] flex flex-col gap-4 items-center">
         {rightDoor.map((post) => (
           <PostItem key={post._id} post={post} currentUserId={user?._id} />
         ))}
