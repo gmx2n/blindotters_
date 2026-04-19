@@ -357,7 +357,7 @@ export default function ChatPage() {
 
         <div className="w-80 bg-white border border-gray-200 rounded-2xl shadow-sm flex flex-col overflow-hidden">
           <div className="p-4 border-b border-gray-100">
-            <h2 className="font-bold text-lg">🥬 Your Fridge</h2>
+            <h2 className="font-bold text-lg">Your Fridge</h2>
             <p className="text-xs text-gray-500">Click to add to chat</p>
           </div>
 
