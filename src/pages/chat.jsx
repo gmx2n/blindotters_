@@ -1,11 +1,53 @@
 import { useState } from "react";
-import { usePaginatedQuery, useQuery, useAction } from "convex/react";  // ← add usePaginatedQuery
+import { usePaginatedQuery, useQuery, useAction } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Link } from "react-router";
 
+const LOCAL_IMAGES = {
+  "apple juice": "/apple juice.png",
+  "apple": "/apple.png",
+  "asparagus": "/asparagus.png",
+  "avocado": "/avocado.png",
+  "beets": "/beets.png",
+  "bread": "/bread.png",
+  "brocolli": "/brocolli.png",
+  "broccoli": "/brocolli.png",
+  "carrot": "/carrot.png",
+  "carrots": "/carrot.png",
+  "corn": "/corn.png",
+  "chicken": "/chicken.png",
+  "egg": "/egg.png",
+  "eggs": "/egg.png",
+  "eggplant": "/eggplant.png",
+  "fruit": "/fruit .png",
+  "green onion": "/green onion.png",
+  "green onions": "/green onion.png",
+  "lettuce": "/lettuce.png",
+  "milk": "/milk.png",
+  "pasta": "/pasta.png",
+  "potato": "/potato.png",
+  "potatoes": "/potato.png",
+  "red pepper": "/redpepper.png",
+  "redpepper": "/redpepper.png",
+  "strawberry": "/strawberry.png",
+  "tomato": "/tomato.png",
+  "tomatoes": "/tomato.png",
+  "olive oil": "/virginoil (1).png",
+  "oil": "/virginoil (1).png",
+};
+
+function getLocalImage(name) {
+  const lower = name.toLowerCase().trim();
+  if (LOCAL_IMAGES[lower]) return LOCAL_IMAGES[lower];
+  for (const key in LOCAL_IMAGES) {
+    if (lower.includes(key) || key.includes(lower)) return LOCAL_IMAGES[key];
+  }
+  return null;
+}
+
 export default function ChatPage() {
   const user = useQuery(api.users.getUser);
-  const { results: posts } = usePaginatedQuery(   // ← change useQuery to usePaginatedQuery
+  const { results: posts } = usePaginatedQuery(
     api.posts.getPosts,
     {},
     { initialNumItems: 50 }
@@ -44,7 +86,6 @@ export default function ChatPage() {
         <Link to="/" className="btn btn-sm">← Back to Fridge</Link>
       </div>
 
-      {/* show their ingredients */}
       <div className="mb-6">
         <h2 className="text-xl font-semibold mb-3">Your Ingredients</h2>
         {usersPosts.length === 0 ? (
@@ -58,6 +99,8 @@ export default function ChatPage() {
                 (new Date(post.expiration).getTime() - Date.now()) /
                 (1000 * 60 * 60 * 24)
               );
+              const imgSrc = getLocalImage(post.name) || post.imageUrl;
+
               return (
                 <div
                   key={post._id}
@@ -66,7 +109,11 @@ export default function ChatPage() {
                     : "bg-gray-100 border-gray-300 text-gray-700"
                     }`}
                 >
-                  <img src={post.imageUrl} alt={post.name} className="w-5 h-5 rounded-full object-cover" />
+                  <img
+                    src={imgSrc}
+                    alt={post.name}
+                    className="w-5 h-5 rounded-full object-cover"
+                  />
                   {post.name}
                   <span className="text-xs opacity-70">
                     {daysLeft <= 0 ? "Expired!" : `${daysLeft}d left`}
@@ -78,7 +125,6 @@ export default function ChatPage() {
         )}
       </div>
 
-      {/* get recipes button */}
       <button
         className="w-full btn btn-success text-lg p-4 mb-8"
         onClick={fetchRecipes}
@@ -87,7 +133,6 @@ export default function ChatPage() {
         {loading ? "Chef AI is thinking..." : "Get AI Recipes"}
       </button>
 
-      {/* recipes */}
       <div className="space-y-6">
         {recipes.map((r, i) => (
           <div
