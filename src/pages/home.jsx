@@ -10,6 +10,14 @@ export default function HomePage() {
     { initialNumItems: 10 }
   );
   const usersPosts = posts.filter((post) => post.authorId === user?._id);
+  const Post = ({ imageName }) => {
+    return (
+      <div>
+        {/* This assumes your images are in the public folder */}
+        <img src={`/${imageName}.png`} alt={imageName} />
+      </div>
+    );
+  };
 
   return (
     <div>
@@ -20,7 +28,7 @@ export default function HomePage() {
         <div className="container p-4">
           <div className="flex flex-wrap gap-2">
             {usersPosts?.map((post) => (
-              <Post key={post._id} post={post.name.png} />
+              <Post key={post._id} imageName={post.name} />
             ))}
           </div>
           <Link to="/chat" className="btn btn-success fixed bottom-6 right-6 z-50">
