@@ -88,7 +88,7 @@ export default function HomePage() {
       </div>
 
       {/* CENTER */}
-      <div className="absolute top-[20%] left-[25%] w-[50%] flex flex-wrap gap-4 justify-center content-start">
+      <div className="absolute top-[23%] left-[25%] w-[50%] flex flex-wrap gap-4 justify-center content-start">
         {solids.map((post) => (
           <PostItem key={post._id} post={post} currentUserId={user?._id} />
         ))}
@@ -141,7 +141,7 @@ function PostItem({ post, currentUserId }) {
       <img
         src={imgSrc}
         alt={post.name}
-        className="w-20 h-20 object-contain"   // ← bigger! (was w-10 h-10)
+        className="w-30 h-30 object-contain" 
       />
 
       {post.authorId === currentUserId && hover && (
