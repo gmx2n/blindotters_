@@ -92,7 +92,7 @@ function SignupForm() {
                 e.preventDefault();
 
                 if (e.currentTarget.password.value !== e.currentTarget.passwordconfirm.value) {
-                    alert("dijgoifjowe");
+                    alert("Your passwords do not match");
                     return;
                 }
 
